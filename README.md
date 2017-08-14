@@ -16,9 +16,9 @@ There are two ways to use the NPort
 3. NPort middlware talks to NPort using system tcpip
 4. NPort talks to serial device using serial (RS-232, RS-484) 
 
-# TCP Client Mode
+The rest of this docuemnt refers exclusively to operation in TCP Client Mode since
 
-## Configuring With Web Browser
+# Configuring TCP Client Mode With Web Browser
 
 In a browser, navigate to the IP of the Moxa.  In the web-based configuration tool.  
 
@@ -29,14 +29,14 @@ In a browser, navigate to the IP of the Moxa.  In the web-based configuration to
 - For single-serial-port Moxas, the default tcpip port is 4001.  Matlab will neet to configure the `tcpclient` or  `tcpip` instance with this port.  
 - For multi-serial-port Moxas, each serial port on the Moxa is assigned a different TCP/IP port, starting with 4001, e.g.: 4001, 4002, 4003, etc.
 
-## Serial settings (Baud Rate, Data Bits, etc.) on Moxa and Device Must Match
+# Serial Settings (Baud Rate, Data Bits, etc.) on Moxa and Serial Device Must Match
 
 In a browser, navigate to the IP of the Moxa.  In the web-based configuration tool:
 
 1. Click “Serial Settings” -> “Port 1” (or other port) navigation item on the left
 2. Configure the Moxa to communicate with the device using the parameters that were configured on the device. 
 
-### Example: Keithley 6482
+## Example: Keithley 6482
 
 On the Keithley, 
 
@@ -48,13 +48,13 @@ In a browser, navigate to the IP of the Moxa.  In the web-based configuration to
 1. Click “Serial Settings” -> “Port 1” (or other port) navigation item on the left
 2. Configure the Moxa to communicate with the Keithley using the parameters that were configured on the hardware. Keithley hardware.
 
-### Example: Micronix MMC 103
+## Example: Micronix MMC 103
 
 - The FTDI board in the MMC-103 uses a baud rate of 38400. The baud rate on the MMC-103 cannot be changed. 
 - The Baud Rate of the Moxa must be configured to 38400.
 - If the Baud Rate of the Moxa is not set to 38400, communication between the NPort and the FTDI board on the MMC-103 **won't work**.
 
-## Data Packing
+# Data Packing
 
 **When NPort receives data from the seril device, does it immediately send it out over the network?**
 
@@ -70,7 +70,7 @@ The simplest solution is to set `Packing Length` to zero and do not bother with 
 
 The downside of this approach is that sometimes a single “response” from the serial device is separated into multiple network packets from Moxa NPort to the MATLAB `tcpclient`, but this is not a big deal.
 
-### Configuring Data Packing to Use Delimiters (Optional)
+## Configuring Data Packing to Use Delimiters (Optional)
 
 If you want to configure data packing to use delimiters, here is an example setup. 
 
