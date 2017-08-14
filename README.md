@@ -12,7 +12,7 @@ There are two ways to use the NPort
 
 ## 2. Real COM Mode
 1. Install NPort middleware software on the CPU to create a virtual COM port.
-2. MATLAB talks to virtual COM port (NPort middleware using `MATLAB.serial()` as if it was a real COM port
+2. MATLAB talks to virtual COM port (NPort middleware) using `MATLAB.serial()` as if it was a real COM port
 3. NPort middlware talks to NPort using system tcpip
 4. NPort talks to serial device using serial (RS-232, RS-484) 
 
@@ -66,16 +66,17 @@ Serial data sent from the serial device to the NPort accumulates in the NPort’
 
 After the enabled criteria is satisfied the data is packed for network transmission from the Moxa NPort to the client. 
 
-The simplest solution is to set `Packing Length` to zero and do not bother with delimeters.  In this case, any time the Keithley sends the NPort serial data, that data is immediately packed for network transmission from Moxa NPort to the MATLAB `tcpclient` instance, increasing the `BytesAvailable` property of the `tcpclient`.  
+The simplest solution is to set `Packing Length` to zero and do not bother with delimeters.  In this case, any time the serial device sends the NPort serial data, that data is immediately packed for network transmission from Moxa NPort to the MATLAB `tcpclient` instance, increasing the `BytesAvailable` property of the `tcpclient`.  
 
-The downside of this approach is that sometimes a single “response” from the Keithley is separated into multiple network packets from Moxa NPort to the MATLAB `tcpclient`, but this is not a big deal.
+The downside of this approach is that sometimes a single “response” from the serial device is separated into multiple network packets from Moxa NPort to the MATLAB `tcpclient`, but this is not a big deal.
 
 ### Configuring Data Packing to Use Delimiters (Optional)
 
-If you want to configure data packing to use delimiters, here is a recommended setup. 
-- Configure the Keithley to use a carriage return terminator. Recall that ASCII is a 8-bit character system (256 characters).  The base10 representation of the carriage return character is 13, which is 0D in hex, or 00001101 in binary.  
-- Once the Keithley is configured to use a carriage return terminator, set the NPort “Operation Settings” -> Data Packing -> Delimiter 1 to “0d” (hex) and enable it.  
-- Once enabled, Moxa NPort will buffer all serial data sent from the Keithley (possibly over multiple transmissions) until the carriage return is received from the Keithley, after which the data is packed for network transmisison. 
+If you want to configure data packing to use delimiters, here is an example setup. 
+
+- Configure the serial device to use a carriage return terminator. Recall that ASCII is a 8-bit character system (256 characters).  The base10 representation of the carriage return character is 13, which is 0x0D in hex, or 00001101 in binary.  
+- Set the NPort “Operation Settings” -> Data Packing -> Delimiter 1 to “0d” (hex) and enable it.  
+- Once enabled, Moxa NPort will buffer all serial data sent from the serial device (possibly over multiple transmissions) until the carriage return is received from the serial device, after which the data is packed for network transmisison. 
 
 
 ## Great Resource
