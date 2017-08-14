@@ -1,52 +1,40 @@
-# moxa-nport-notes
+# matlab-moxa-nport-notes
 Notes on Using Moxa NPort Serial Device Servers with MATLAB serial(), tcpip() and tcpclient()
 
-# Moxa NPort Operation Mode
+# Operation Mode
 
-There are two primary ways to use the NPort
+There are two ways to use the NPort
 
-## 1. TCP Client Operation Mode
+## 1. TCP Client Mode
 1. MATLAB talks to the NPort using `MATLAB.tcpip()` or `MATLAB.tcpclient()`
 2. NPort talks to the hardware using serial (RS-232, RS-485)
 
-### Details
-- Client connects to local network
-- Ethernet cable between Serial Device Server and local network
-- MATLAB uses `tcpip()` to communicate with Serial Device Server over local network
-- RS-485 cable between Serial Device Server and MMC-103
 
 ## 2. Real COM Mode
-1. Install NPort middleware software on the CPU (virtual COM port)
-2. MATLAB talks to NPort middleware (virtual COM port) using `MATLAB.serial()`
-3. NPort middlware talks to NPort using tcpip
-4. NPort talks to hardware using serial (RS-232, RS-484) 
+1. Install NPort middleware software on the CPU to create a virtual COM port.
+2. MATLAB talks to virtual COM port (NPort middleware using `MATLAB.serial()` as if it was a real COM port
+3. NPort middlware talks to NPort using system tcpip
+4. NPort talks to serial device using serial (RS-232, RS-484) 
 
-### Details
-- RS-485 cable between Serial Device Server and MMC-103
-- Ethernet cable between Serial Device Server local network
-- Client connects to local network
-- Middleware software converts ethernet-conneciton to Serial Device Server into Virtual COM Port
-- MATLAB uses `serial()` to communicate with middleware Virtual COM Port.  Middleware communicates to Serial Device Server over local network
+# TCP Client Mode
 
+## Configuring With Web Browser
 
+In a browser, navigate to the IP of the Moxa.  In the web-based configuration tool.  
 
+1. Click “Operating Settings” -> “Port 1” 
+2. Set the dropdown to “TCP Client”
+3. Scroll to the bottom and click “Submit”
 
+- For single-serial-port Moxas, the default tcpip port is 4001.  Matlab will neet to configure the `tcpclient` or  `tcpip` instance with this port.  
+- For multi-serial-port Moxas, each serial port on the Moxa is assigned a different TCP/IP port, starting with 4001, e.g.: 4001, 4002, 4003, etc.
 
-## Use Moxa in TCP Client Mode
-
-From the Moxa Web Inspector, go to “Operating Settings” -> “Port 1” and set the dropdown to “TCP Client” and scroll to the bottom and click “Submit”
-
-For single-serial-port Moxas, the default Port is 4001.  Matlab will neet to configure the `tcpclient` instance with this port.  For multi-serial-port Moxas each serial port on the Moxa is assigned a different TCP/IP port
-
-
-
-
-## Serial settings (Baud Rate, Data Bits, etc.) on Moxa and Harwdare Must Match
+## Serial settings (Baud Rate, Data Bits, etc.) on Moxa and Device Must Match
 
 In a browser, navigate to the IP of the Moxa.  In the web-based configuration tool:
 
 1. Click “Serial Settings” -> “Port 1” (or other port) navigation item on the left
-2. Configure the Moxa to communicate with the device using the parameters that were configured on the device. \
+2. Configure the Moxa to communicate with the device using the parameters that were configured on the device. 
 
 ### Example: Keithley 6482
 
@@ -60,25 +48,17 @@ In a browser, navigate to the IP of the Moxa.  In the web-based configuration to
 1. Click “Serial Settings” -> “Port 1” (or other port) navigation item on the left
 2. Configure the Moxa to communicate with the Keithley using the parameters that were configured on the hardware. Keithley hardware.
 
-
 ### Example: Micronix MMC 103
 
-- The NPort Middleware (NPort Administrator) COM mapping must be configured to use a baud rate of 38400 and MATLAB's `serial()` must be configured to use a baud rate of 38400.  38400 is the baud rate that the FTDI board in the MMC-103 uses. If these are not both set to 38400, communication **won't work**.
-- MATLAB's `serial()` must be configured with a terminator of `LF/CR`.  
-    - `CR/LF` (the transpose) **won't work**
-    - Do not include the `\n\r` [new line, carriage return] terminator in commands as the MMC documentation suggests. MATLAB's `serial()` handles termination characters in the background.
-    - DO: `fprintf(this.serial, '1VER?')`
-    - DONT: `fprintf(this.serial, '1VER \n\r')`
+- The FTDI board in the MMC-103 uses a baud rate of 38400. The baud rate on the MMC-103 cannot be changed. 
+- The Baud Rate of the Moxa must be configured to 38400.
+- If the Baud Rate of the Moxa is not set to 38400, communication between the NPort and the FTDI board on the MMC-103 **won't work**.
 
+## Data Packing
 
-## Terminator Characters in Data Transmission
+**When NPort receives data from the seril device, does it immediately send it out over the network?**
 
-MATLAB must still send whatever terminator characters the device (serial hardware) expects as if it were being communicated to directly with `MATLAB.serial()`  The device will also reply with whatever terminator characters it normally would!
-
-
-## Data Packing (When NPort Receives Data from the device, Does it Immediately Send it out Over The Network?)
-
-Serial data sent from the Keithley to the NPort accumulates in the NPort’s serial buffer until one of two things happen
+Serial data sent from the serial device to the NPort accumulates in the NPort’s serial buffer until one of two things happen
 
 1. The buffer fills up to the specified `Packing Length` value.  *Note, however, that when `Packing Length` is set to zero, the NPort immediately packs serial data for network transmission.*
 2. The configured delimiter character(s) are received *When this option is enabled, `Packing Length` parameter has no effect.*
@@ -86,7 +66,7 @@ Serial data sent from the Keithley to the NPort accumulates in the NPort’s ser
 
 After the enabled criteria is satisfied the data is packed for network transmission from the Moxa NPort to the client. 
 
-The simplest solution is to set `Packing Length` to zero and do not bother with delimeters.  In this case, any time the Keithley sends the NPort serial data, that data is immediately packet for network transmission from Moxa NPort to the MATLAB `tcpclient` instance, increasing the `BytesAvailable` property of the `tcpclient`.  
+The simplest solution is to set `Packing Length` to zero and do not bother with delimeters.  In this case, any time the Keithley sends the NPort serial data, that data is immediately packed for network transmission from Moxa NPort to the MATLAB `tcpclient` instance, increasing the `BytesAvailable` property of the `tcpclient`.  
 
 The downside of this approach is that sometimes a single “response” from the Keithley is separated into multiple network packets from Moxa NPort to the MATLAB `tcpclient`, but this is not a big deal.
 
@@ -98,7 +78,6 @@ If you want to configure data packing to use delimiters, here is a recommended s
 - Once enabled, Moxa NPort will buffer all serial data sent from the Keithley (possibly over multiple transmissions) until the carriage return is received from the Keithley, after which the data is packed for network transmisison. 
 
 
-  
 ## Great Resource
 [RS-232, RS-422, RS-485 Serial Communication General Concepts](http://www.ni.com/white-paper/11390/en/)
 
