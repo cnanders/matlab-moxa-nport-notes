@@ -16,9 +16,9 @@ There are two ways to use the NPort
 3. NPort middlware talks to NPort using system tcpip
 4. NPort talks to serial device using serial (RS-232, RS-484) 
 
-The rest of this docuemnt refers exclusively to operation in TCP Client Mode since
+The rest of this docuemnt refers exclusively to operation in TCP Server Mode since
 
-# Configuring TCP ServerMode With Web Browser
+# Configuring TCP Server Mode With Web Browser
 
 In a browser, navigate to the IP of the Moxa.  In the web-based configuration tool.  
 
