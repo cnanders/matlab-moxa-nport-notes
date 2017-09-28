@@ -5,7 +5,7 @@ Notes on Using Moxa NPort Serial Device Servers with MATLAB serial(), tcpip() an
 
 There are two ways to use the NPort
 
-## 1. TCP Client Mode
+## 1. TCP Server Mode
 1. MATLAB talks to the NPort using `MATLAB.tcpip()` or `MATLAB.tcpclient()`
 2. NPort talks to the hardware using serial (RS-232, RS-485)
 
@@ -18,12 +18,12 @@ There are two ways to use the NPort
 
 The rest of this docuemnt refers exclusively to operation in TCP Client Mode since
 
-# Configuring TCP Client Mode With Web Browser
+# Configuring TCP ServerMode With Web Browser
 
 In a browser, navigate to the IP of the Moxa.  In the web-based configuration tool.  
 
 1. Click “Operating Settings” -> “Port 1” 
-2. Set the dropdown to “TCP Client”
+2. Set the dropdown to “TCP Server”
 3. Scroll to the bottom and click “Submit”
 
 - For single-serial-port Moxas, the default tcpip port is 4001.  Matlab will neet to configure the `tcpclient` or  `tcpip` instance with this port.  
